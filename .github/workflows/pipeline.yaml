@@ -38,10 +38,7 @@ jobs:
 
       - name: Pull dataset from S3
         run: |
-          ls -lR .
           dvc pull
-          ls -l data
-          ls -lR data 
 
       - name: Train model
         run: |
@@ -49,12 +46,14 @@ jobs:
 
       - name: Push model to S3
         run: |
+          MODEL_VERSION="${GITHUB_SHA}"
+          MODEL_URI="s3://dvc-bucket-mlops-dhruv/models/${MODEL_VERSION}/"
+
           aws s3 cp models/churn_model.pkl \
-            s3://dvc-bucket-mlops-dhruv/models/churn_model.pkl
+            "${MODEL_URI}model.pkl"
 
       - name: Update inferenceservice.yaml with S3 model path
         run: |
-          MODEL_URI="s3://dvc-bucket-mlops-dhruv/models/churn_model.pkl"
           sed -i "s|storageUri: .*|storageUri: $MODEL_URI|g" k8_manifest/inferenceservice.yaml
 
       - name: Commit updated inferenceservice.yaml
@@ -62,5 +61,6 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add k8_manifest/inferenceservice.yaml
-          git commit -m "Update model S3 path"
+          git commit -m "Update model version ${GITHUB_SHA}"
           git push origin HEAD:cicd-mlops
+    
