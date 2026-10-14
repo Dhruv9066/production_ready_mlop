@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - cicd-mlops
-
+  workflow_dispatch:
 permissions:
   contents: write
 
