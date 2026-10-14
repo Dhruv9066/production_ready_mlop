@@ -38,9 +38,10 @@ jobs:
 
       - name: Pull dataset from S3
         run: |
+          ls -lR .
           dvc pull
           ls -l data
-          la -lR data 
+          ls -lR data 
 
       - name: Train model
         run: |
