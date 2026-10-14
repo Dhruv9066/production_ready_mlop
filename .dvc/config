@@ -1,0 +1,4 @@
+[core]
+    remote = churn-origin
+['remote "churn-origin"']
+    url = s3://dvc-bucket-mlops-dhruv
