@@ -6,5 +6,7 @@ metadata:
 spec:
   predictor:
     serviceAccountName: sa-s3-access
-    sklearn:
-      storageUri: 
+    model:
+      modelFormat:
+        name: sklearn
+      storageUri: s3://dvc-bucket-mlops-dhruv/models/initial-version/
