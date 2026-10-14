@@ -1,3 +1,4 @@
+
 name: mlops-pipeline
 
 on:
@@ -52,15 +53,25 @@ jobs:
           aws s3 cp models/churn_model.pkl \
             "${MODEL_URI}model.pkl"
 
+          echo "MODEL_URI=$MODEL_URI" >> "$GITHUB_ENV"
+
       - name: Update inferenceservice.yaml with S3 model path
         run: |
-          sed -i "s|storageUri: .*|storageUri: $MODEL_URI|g" k8_manifest/inferenceservice.yaml
+          sed -i "s|storageUri:.*|storageUri: $MODEL_URI|g" k8_manifest/inferenceservice.yaml
+
+          echo "Updated InferenceService:"
+          cat k8_manifest/inferenceservice.yaml
 
       - name: Commit updated inferenceservice.yaml
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+
           git add k8_manifest/inferenceservice.yaml
-          git commit -m "Update model version ${GITHUB_SHA}"
-          git push origin HEAD:cicd-mlops
-    
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update model version ${GITHUB_SHA}"
+            git push origin HEAD:cicd-mlops
+          fi
