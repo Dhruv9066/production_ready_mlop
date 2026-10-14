@@ -42,7 +42,7 @@ jobs:
 
       - name: Train model
         run: |
-          python ./train_model.py
+          python train_model.py
 
       - name: Push model to S3
         run: |
