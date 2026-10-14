@@ -1,0 +1,63 @@
+name: mlops-pipeline
+
+on:
+  push:
+    branches:
+      - cicd-mlops
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install "dvc[s3]"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Pull dataset from S3
+        run: |
+          dvc pull
+
+      - name: Train model
+        run: |
+          python ./train_model.py
+
+      - name: Push model to S3
+        run: |
+          aws s3 cp models/churn_model.pkl \
+            s3://dvc-bucket-mlops-dhruv/models/churn_model.pkl
+
+      - name: Update inferenceservice.yaml with S3 model path
+        run: |
+          MODEL_URI="s3://dvc-bucket-mlops-dhruv/models/churn_model.pkl"
+          sed -i "s|storageUri: .*|storageUri: $MODEL_URI|g" k8_manifest/inferenceservice.yaml
+
+      - name: Commit updated inferenceservice.yaml
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add k8_manifest/inferenceservice.yaml
+          git commit -m "Update model S3 path"
+          git push origin HEAD:cicd-mlops
