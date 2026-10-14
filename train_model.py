@@ -1,4 +1,6 @@
 """Train churn prediction model"""
+
+import os
 import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
@@ -14,7 +16,9 @@ X = df[features]
 y = df['churn']
 
 # Split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
 # Train
 model = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -29,6 +33,9 @@ auc = roc_auc_score(y_test, y_proba)
 
 print(f"Accuracy: {accuracy:.4f}")
 print(f"AUC-ROC: {auc:.4f}")
+
+# Create models directory if it doesn't exist
+os.makedirs("models", exist_ok=True)
 
 # Save model
 with open('models/churn_model.pkl', 'wb') as f:
