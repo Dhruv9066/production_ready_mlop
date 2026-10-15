@@ -9,7 +9,7 @@ spec:
     model:
       modelFormat:
         name: sklearn
-      storageUri: s3://dvc-bucket-mlops-dhruv/models/d3732ad8605ad52335d4a35f6fc16c422a9fddb2/
+      storageUri: s3://dvc-bucket-mlops-dhruv/models/81f311aa8df644be84a51a91e5dc1658d8b54b1e/
       resources:
         requests:
           cpu: "100m"
