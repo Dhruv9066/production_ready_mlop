@@ -9,4 +9,4 @@ spec:
     model:
       modelFormat:
         name: sklearn
-      storageUri: s3://dvc-bucket-mlops-dhruv/models/8d292a6b3bf119cde961f78f3a255df637fe033b/
+      storageUri: s3://dvc-bucket-mlops-dhruv/models/13a7086f32311980da57cb5c4b404612b24e8394/
